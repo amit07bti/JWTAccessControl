@@ -1,5 +1,4 @@
 package com.edusol.service;
-
 import com.edusol.dto.Product;
 import com.edusol.model.UserInfo;
 import com.edusol.repository.UserInfoRepository;
@@ -46,6 +45,7 @@ public class ProductService {
                 .findAny()
                 .orElseThrow(() -> new RuntimeException("product " + id + " not found"));
     }
+
 
     public String addUser(UserInfo userInfo) {
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));

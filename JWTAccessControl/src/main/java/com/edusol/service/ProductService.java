@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 @Service
 public class ProductService {
 
-    List<Product> productList = null;
+    private List<Product> productList;
 
     @Autowired
     private UserInfoRepository repository;
@@ -23,17 +23,19 @@ public class ProductService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private final Random random = new Random();
+
     @PostConstruct
     public void loadProductsFromDB() {
         productList = IntStream.rangeClosed(1, 100)
                 .mapToObj(i -> Product.builder()
                         .productId(i)
-                        .name("product " + i)
-                        .qty(new Random().nextInt(10))
-                        .price(new Random().nextInt(5000)).build()
+                        .name("Product " + i)
+                        .qty(random.nextInt(1, 11)) // quantity 1 to 10
+                        .price(random.nextInt(100, 5001)) // price 100 to 5000
+                        .build()
                 ).collect(Collectors.toList());
     }
-
 
     public List<Product> getProducts() {
         return productList;
@@ -42,14 +44,16 @@ public class ProductService {
     public Product getProduct(int id) {
         return productList.stream()
                 .filter(product -> product.getProductId() == id)
-                .findAny()
-                .orElseThrow(() -> new RuntimeException("product " + id + " not found"));
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Product " + id + " not found"));
     }
 
-
     public String addUser(UserInfo userInfo) {
+        if (userInfo.getPassword() == null || userInfo.getPassword().isEmpty()) {
+            throw new RuntimeException("Password cannot be null or empty");
+        }
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         repository.save(userInfo);
-        return "user added to system ";
+        return "User added to system";
     }
 }
